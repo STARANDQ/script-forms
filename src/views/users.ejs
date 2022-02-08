@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Login Register App</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+	</script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+
+<script>
+  function remove(id, login){
+    let remove = confirm(`Хотите удалить пользователя ${login}?`);
+
+    if (remove) {
+
+      $.ajax({
+        type: 'POST',
+        url: '/user/delete',
+        data: {"id":id},
+        dataType: "json",
+        success: (response) => {
+          if (response.success) {
+            window.location.reload();
+          }
+        },
+        error: () => {
+        }
+      })
+    }
+
+  }
+</script>
+
+<body>
+  <div class="col-md-6 mx-auto form-card">
+    <div>
+      <p>Управление акаунтами</p>
+    </div>
+    <div class="abc">
+      <a href="/register">Зарегестрировать профиль</a>
+    </div>
+    <br />
+    <div>
+      <center>
+        <table class="table table-hover text-center">
+  
+          <tr>
+            <td>Логин</td>
+            <td>Фамилия</td>
+            <td>Имя</td>
+            <td>Отчество</td>
+            <td>eMail</td>
+            <td>Роль</td>
+            <td>Действия</td>
+          </tr>
+          <% data.forEach(elem => {  %>
+            <tr>
+              <td><%= elem.login %></td>
+              <td><%= elem.surname %></td>
+              <td><%= elem.name %></td>
+              <td><%= elem.patronymic %></td>
+              <td><%= elem.email %></td>
+              <td>
+              <% if (elem.role === "admin") { %>
+                <span style="color:red">Администратор</span>
+              <% } else if(elem.role === "user") { %>
+                <span style="color:gray">Пользователь</span>
+              <% } %>
+              </td>
+              <td>
+                <a style="text-decoration: underline; cursor: pointer;" href="/user/<%= elem.login %>">Изменить</a>
+                <% if(userId !== elem.unique_id) { %>
+                  <a style="text-decoration: underline; cursor: pointer;" onclick="remove('<%= elem.unique_id %>','<%= elem.login %>')">Удалить</a>
+                  <% } %>
+                </td>
+              </tr>
+          <% } ) %>
+        </table>
+      </center>
+    </div>
+    <div class="abc">
+      <a href="/profile">Назад</a>
+    </div>
+    <br><br>
+  </div>
+</body>
+</html>

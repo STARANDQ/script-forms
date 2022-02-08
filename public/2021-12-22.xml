@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<forms date="2021-12-22">
+  <form form_id="1" form_name="Форма" id_klient="1" id_code="1" weight="0" full-weight="0">
+    <keys>
+      <key label="eee" value="xxx"/>
+    </keys>
+    <fields>
+      <field type="file" label="файл" value="2021-12-19 (2).xml"/>
+    </fields>
+  </form>
+</forms>

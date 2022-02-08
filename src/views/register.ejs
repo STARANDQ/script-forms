@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Login Register App</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+	</script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="./css/main.css">
+
+	<script type="text/javascript">
+
+		$(document).ready(() => {
+			$("#form1").submit((event) => {
+				event.preventDefault();
+
+				$.ajax({
+					type: 'POST',
+					url: '/register',
+					data: $('#form1').serialize(),
+					dataType: "json",
+					success: (response) => {
+						if (response.error) {
+							document.getElementById("check").innerHTML =  response.error;
+							return
+						}
+						
+						if (response.success) {
+							$('#form1')[0].reset();
+							document.getElementById("aa").click();
+						}
+					},
+					error: () => {
+					}
+				})
+			});
+		});
+	</script>
+
+</head>
+
+<body>
+
+	<div class="col-md-6 mx-auto form-card">
+		<div>
+			<p>Register</p>
+		</div>
+		<div class="form-group">
+			<form id="form1" method="post">
+				<input type="text" name="name" placeholder="Имя" class="form-control"><br />
+				<input type="text" name="surname" placeholder="Фамилия" class="form-control"><br />
+				<input type="text" name="patronymic" placeholder="Отчество" class="form-control"><br />
+				<input type="email" name="email" placeholder="Email" class="form-control"><br />
+				<select class="form-control" name = "role" required>
+					<option value="user">Пользователь</option>
+					<option value="admin">Администратор</option>
+				</select><br/>
+				<div id = "add"></div>
+        <input id="login" type="text" name="login" placeholder="Логин" required class="form-control"><br />
+				<input type="password" name="password" placeholder="Пароль" required class="form-control"><br />
+				<input type="submit" value="Register" class="btn btn-success">
+			</form>
+		</div>
+
+		<div class="mssg bg-danger">
+			<span id="check"></span>
+		</div>
+		<div id="LangTable"><a href="/users" id="aa"></a>
+		</div>
+		<div class="abc">
+			<a href="/users">Назад</a>
+		</div>
+	</div>
+</body>
+
+</html>

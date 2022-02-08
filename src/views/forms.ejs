@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Login Register App</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+	</script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+
+<script>
+  function remove(id, name){
+    let remove = confirm(`Хотите удалить форму ${name}?`);
+
+    if (remove) {
+      $.ajax({
+        type: 'POST',
+        url: '/form/delete',
+        data: {"id":id},
+        dataType: "json",
+        success: (response) => {
+          if (response.success) {
+            window.location.reload();
+          }
+        },
+        error: () => {
+        }
+      })
+    }
+  }
+
+  function copyLink(params, formID) {
+    let link = `${window.location.origin}/${formID}`
+    link += `?id_klient=xxx&id_code=xxx`
+    JSON.parse(params).forEach(({ label, access }) => {
+      if (access) {
+        link += `&${label}=xxx`
+      }
+    });
+
+    $(`#link-${formID}`).val(link)
+    $(`#link-${formID}`).select()
+    document.execCommand("copy")
+
+    alert(`Ссылка ${link} скопирована`)
+  }
+</script>
+
+<body>
+  <div class="col-md-6 mx-auto form-card">
+    <div>
+      <p>Управление формами</p>
+    </div>
+    <div class="abc">
+      <a href="/form/create">Создать форму</a>
+    </div>
+    <br />
+    <div>
+      <center>
+        <table class="table table-hover text-center">
+  
+          <tr>
+            <td>Название</td>
+            <td>Публичние ключи</td>
+            <td>Вес</td>
+            <td>Статус</td>
+            <td>Действия</td>
+            <td></td>
+          </tr>
+          <% data.forEach(elem => {  %>
+            <tr>
+              <td><%= elem.name %></td>
+              <td> <% elem.keys.forEach(key => { if (key.access) { %>
+                <li><%= key.label %></li>
+                <% } }) %></td>
+              <td><%= elem.weight %></td>
+              <td>
+              <% if (elem.status) { %>
+                <span style="color:blue">Активная</span>
+              <% } else { %>
+                <span style="color:red">Закрытая</span>
+              <% } %>
+              </td>
+              <td>
+                <a style="text-decoration: underline; cursor: pointer;" href="/form/<%= elem.unique_id %>">Изменить</a>
+                <a style="text-decoration: underline; cursor: pointer;" onclick="remove('<%= elem.unique_id %>', '<%= elem.name %>')">Удалить</a>
+              </td>
+              <td style="position: relative;">
+                <button class="btn btn-light" onclick="copyLink('<%=JSON.stringify(elem.keys) %>', '<%= elem._id %>')"><img width="15" height="15" alt="" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTE1Ljc3IDEyMi44OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTE1Ljc3IDEyMi44OCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHN0eWxlIHR5cGU9InRleHQvY3NzIj4uc3Qwe2ZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2RkO308L3N0eWxlPjxnPjxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04OS42MiwxMy45NnY3LjczaDEyLjE5aDAuMDF2MC4wMmMzLjg1LDAuMDEsNy4zNCwxLjU3LDkuODYsNC4xYzIuNSwyLjUxLDQuMDYsNS45OCw0LjA3LDkuODJoMC4wMnYwLjAyIHY3My4yN3YwLjAxaC0wLjAyYy0wLjAxLDMuODQtMS41Nyw3LjMzLTQuMSw5Ljg2Yy0yLjUxLDIuNS01Ljk4LDQuMDYtOS44Miw0LjA3djAuMDJoLTAuMDJoLTYxLjdINDAuMXYtMC4wMiBjLTMuODQtMC4wMS03LjM0LTEuNTctOS44Ni00LjFjLTIuNS0yLjUxLTQuMDYtNS45OC00LjA3LTkuODJoLTAuMDJ2LTAuMDJWOTIuNTFIMTMuOTZoLTAuMDF2LTAuMDJjLTMuODQtMC4wMS03LjM0LTEuNTctOS44Ni00LjEgYy0yLjUtMi41MS00LjA2LTUuOTgtNC4wNy05LjgySDB2LTAuMDJWMTMuOTZ2LTAuMDFoMC4wMmMwLjAxLTMuODUsMS41OC03LjM0LDQuMS05Ljg2YzIuNTEtMi41LDUuOTgtNC4wNiw5LjgyLTQuMDdWMGgwLjAyaDYxLjcgaDAuMDF2MC4wMmMzLjg1LDAuMDEsNy4zNCwxLjU3LDkuODYsNC4xYzIuNSwyLjUxLDQuMDYsNS45OCw0LjA3LDkuODJoMC4wMlYxMy45Nkw4OS42MiwxMy45NnogTTc5LjA0LDIxLjY5di03Ljczdi0wLjAyaDAuMDIgYzAtMC45MS0wLjM5LTEuNzUtMS4wMS0yLjM3Yy0wLjYxLTAuNjEtMS40Ni0xLTIuMzctMXYwLjAyaC0wLjAxaC02MS43aC0wLjAydi0wLjAyYy0wLjkxLDAtMS43NSwwLjM5LTIuMzcsMS4wMSBjLTAuNjEsMC42MS0xLDEuNDYtMSwyLjM3aDAuMDJ2MC4wMXY2NC41OXYwLjAyaC0wLjAyYzAsMC45MSwwLjM5LDEuNzUsMS4wMSwyLjM3YzAuNjEsMC42MSwxLjQ2LDEsMi4zNywxdi0wLjAyaDAuMDFoMTIuMTlWMzUuNjUgdi0wLjAxaDAuMDJjMC4wMS0zLjg1LDEuNTgtNy4zNCw0LjEtOS44NmMyLjUxLTIuNSw1Ljk4LTQuMDYsOS44Mi00LjA3di0wLjAyaDAuMDJINzkuMDRMNzkuMDQsMjEuNjl6IE0xMDUuMTgsMTA4LjkyVjM1LjY1di0wLjAyIGgwLjAyYzAtMC45MS0wLjM5LTEuNzUtMS4wMS0yLjM3Yy0wLjYxLTAuNjEtMS40Ni0xLTIuMzctMXYwLjAyaC0wLjAxaC02MS43aC0wLjAydi0wLjAyYy0wLjkxLDAtMS43NSwwLjM5LTIuMzcsMS4wMSBjLTAuNjEsMC42MS0xLDEuNDYtMSwyLjM3aDAuMDJ2MC4wMXY3My4yN3YwLjAyaC0wLjAyYzAsMC45MSwwLjM5LDEuNzUsMS4wMSwyLjM3YzAuNjEsMC42MSwxLjQ2LDEsMi4zNywxdi0wLjAyaDAuMDFoNjEuN2gwLjAyIHYwLjAyYzAuOTEsMCwxLjc1LTAuMzksMi4zNy0xLjAxYzAuNjEtMC42MSwxLTEuNDYsMS0yLjM3aC0wLjAyVjEwOC45MkwxMDUuMTgsMTA4LjkyeiIvPjwvZz48L3N2Zz4=" /></button>
+                <input type="text" style="width: 10px; height: 10px; position: absolute; top: 30%; left: 50%; z-index: -1;"
+                  id='link-<%= elem._id %>'></input>
+              </td>
+            </tr>
+          <% } ) %>
+        </table>
+      </center>
+    </div>
+    <div class="abc">
+      <a href="/profile">Назад</a>
+    </div>
+    <br><br>
+  </div>
+</body>
+</html>

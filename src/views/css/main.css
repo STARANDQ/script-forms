@@ -1,0 +1,56 @@
+.form-card * {
+	margin: 2xp;
+}
+
+.container .form-group {
+	margin-top: .6em;
+	margin-bottom: .6em;
+}
+
+label {
+	font-weight: 500;
+}
+
+.form-card{
+	text-align: center !important;
+}
+.form-card p{
+	margin-top: 20px;
+	font-size: 30px;
+}
+.form-card input{
+	text-align: center;
+}
+.form-card #LangTable{
+	margin-bottom: 15px;
+}
+.form-card{
+	border-radius: 10px;
+	margin-top: 70px;
+	margin-bottom: 70px;
+}
+.mssg{
+	margin-top: 5px;
+	margin-bottom: 5px;
+	border-radius: 5px;
+}
+
+.form-card .field, .form-card .key {
+	background-color: #eaeff6;
+	margin: 5px;
+	padding: 5px;
+}
+.form-card .choices li, .form-card .creator-form-block  {
+	margin: 2px;
+	padding: 3px;
+	border: 1px solid #7f7f7f;
+}
+
+.form-card label {
+	display: block;
+}
+
+.well {
+	margin-top: 7%;
+	margin-bottom: 7%;
+}

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Login Register App</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+	</script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+		<div class="col-md-6 mx-auto form-card">
+			<div>
+				<p><%= login %></p>
+			</div>
+			<div>
+				<center>
+					<table class="table table-hover text-center">
+						<tr>
+							<td>Имя</td>
+							<td>
+								<%= name %>
+							</td>
+						</tr>
+						<tr>
+							<td>Фамилия</td>
+							<td><%= surname %></td>
+						</tr>
+						<tr>
+							<td>Отчество</td>
+							<td><%= patronymic %></td>
+						</tr>
+						<tr>
+							<td>e-Mail</td>
+							<td><%= email %></td>
+						</tr>
+						<tr>
+							<td>Роль</td>
+							<td>
+								<%=  %>
+								<% if (role === "admin") { %>
+									<span style="color:red">Администратор</span>
+								<% } else if(role === "user") { %>
+									<span style="color:blue">Пользователь</span>
+								<% } else { %>
+									role
+								<% } %>
+							</td>
+						</tr>
+					</table>
+				</center>
+			</div>
+			<div class="abc" id="LangTable">
+				<a href="/logout">Logout</a>
+			</div>
+			<br><br>
+			<div>
+				<% if(role === "admin") {%>
+				<div class="abc">
+					<a href="/users">Пользователи</a>
+				</div>
+				<div class="abc">
+					<a href="/forms">Формы</a>
+				</div>
+				<!-- <div class="abc">
+					<a href="/downloadData">Данные</a>
+				</div> -->
+				<%}%>
+				<div class="abc">
+					<a href="/filterByKlient">Поиск по клиенту</a>
+				</div>
+			</div>
+				
+			<br><br>
+			<div class="mb-4 filter row">
+				<div class="keys col-sm-10 row mb-3">
+					<label for="keysInput" class="col-sm-3 col-form-label">Параметры:</label>
+					<div class="col-sm-9">
+						<input list="keysList" class="form-control" id="keysInput">
+						<datalist id="keysList"></datalist>
+					</div>
+				</div>
+
+				<button id="button-filter" class="col-sm-2 btn btn-primary d-inline-block mb-3">Поиск</button>
+
+				<div class="date col-sm-10 row">
+					<label class="col-sm-3 col-form-label">Период:</label>
+					<div class="col-sm-9">
+						<div class="input-group col-sm-3">
+							<span class="input-group-text" id="basic-from">c</span>
+							<input type="date" class="form-control" id="date-from" aria-describedby="basic-from">
+							<span class="input-group-text" id="basic-to">по</span>
+							<input type="date" class="form-control" id="date-to" aria-describedby="basic-to">
+						</div>
+					</div>
+				</div>
+
+				<% if(role === "admin") {%>
+				<button id="button-download" class="col-sm-2 btn btn-primary d-inline-block mb-3" disabled>Выгрузить данные</button>
+				<%}%>
+			</div>
+
+			<div class="mssg bg-danger">
+				<span id="check"></span>
+			</div>
+			<table id="data" class="table table-hover">
+				<tr id="data-tabel-header">
+					<td scope="row">Публичные ключи</td>
+					<td>Данные форм</td>
+				</tr>
+			</table>
+		</div>
+</body>
+<script>
+$(document).ready(function () {
+	let forms = []
+	let filterData = null
+
+	$.ajax({
+		type: 'POST',
+		url: '/getKeys',
+		dataType: "json",
+		success: (response) => {
+			if (response.error) {
+				document.getElementById("check").innerHTML =  response.error;
+				return
+			}
+			
+			if (response.success) {
+				const keyList = $('.filter datalist')
+				response.result.forEach(function (key) {
+					keyList.append(`<option data-value="${key.label}" value="${key.title}"></option>`)
+				})
+			}
+		},
+		error: () => {
+		}
+	})
+
+	$('#button-filter').on('click', function(event) {
+		if (forms.length) $('#button-download').prop('disabled', true)
+		forms = []
+		filterData = null
+
+		let key_title = $('#keysInput').val();
+		let key = $('#keysList [value="' + key_title + '"]').data('value');
+
+		let date_from = $('#date-from').val();
+		let date_to = $('#date-to').val();
+
+		const dataBlock = $("#data")
+		dataBlock.find('tr').not('#data-tabel-header').remove()
+		
+		if (key) {
+			$.ajax({
+				type: 'POST',
+				url: '/data',
+				data: {
+					key,
+					period: {
+						from: date_from,
+						to: date_to,
+					}
+				},
+				dataType: "json",
+				success: (response) => {
+					if (response.error) {
+						document.getElementById("check").innerHTML =  response.error;
+						return
+					}
+					
+					const result = response.result
+					
+					if (response.success) {
+						document.getElementById("check").innerHTML =  '';
+
+						const values = result.filled
+						Object.entries(values).forEach(function ([value, { formID, weight, count, formWeight }]) {
+							forms.push(formID)
+							let progress = Number.parseInt((weight / count) / formWeight * 100) || 0
+
+							let html = '<tr><th scope="row">'
+							// html += '<div>' + key_title + ": " + value + '</div>'
+							html += '<div>' + value + '</div>'
+							html += '</th><td style="width: 60%;"><div class="progress">' +
+									'<div class="progress-bar" role="progressbar" style="width: ' + progress + '%;" aria-valuenow="' + progress + '" aria-valuemin="0" aria-valuemax="100">' + progress + '%</div>' +
+								'</div>'
+								
+							html += '</td></tr>'
+
+							dataBlock.append(html)
+						})
+
+						
+						filterData = {
+							key,
+							period: {
+								from: date_from,
+								to: date_to,
+							}
+						}
+						if (forms.length) $('#button-download').prop('disabled', false)
+					}
+				},
+				error: () => {
+				}
+			})
+		}
+	})
+
+	$('#button-download').on('click', function(event) {
+		if (forms.length && filterData) {
+			function download(filename, data) {
+				let element = document.createElement('a');
+
+				element.setAttribute('href', data);
+				element.setAttribute('download', filename);
+				element.style.display = 'none';
+				document.body.appendChild(element);
+
+				element.click();
+				document.body.removeChild(element);
+			}
+
+			$.ajax({
+				type: 'POST',
+				url: '/generateXml',
+				data: { filterData, forms },
+				dataType: "json",
+				success: (response) => {
+					console.log(response);
+					if (response.error) {
+						document.getElementById("check").innerHTML =  response.error;
+						return
+					}
+
+					document.getElementById("check").innerHTML =  '';
+
+					let filename = "formsData-" + filterData.key
+					if (filterData.period.from || filterData.period.to) filename += '_'
+					if (filterData.period.from) filename += 'from-' + filterData.period.from
+					if (filterData.period.from && filterData.period.to) filename += '_'
+					if (filterData.period.to) filename += 'to-' + filterData.period.to
+					filename += '.xlsx'
+
+					download(filename, response.file);
+				},
+				error: () => {
+				}
+			})
+		}
+	})
+
+})
+</script>
+</html>
