@@ -35,7 +35,7 @@
 							document.getElementById("check").innerHTML =  response.error;
 							return
 						}
-						
+
 						if (response.success) {
 							$('#form1')[0].reset();
 							document.getElementById("aa").click();
@@ -64,6 +64,7 @@
 				<select value="<%= role %>" class="form-control" name = "role" required onchange="checkValue()">
 					<% if(!supervisor) { %><option value="user" <% if(role === "user") { %> selected <% } %>>Пользователь</option><% } %>
 					<option value="admin" <% if(role === "admin") { %> selected <% } %> >Администратор</option>
+					<option value="client" <% if(role === "client") { %> selected <% } %> >Клиент</option>
 				</select><br/>
 				<div id = "add"></div>
 				<input value="<%= login %>" id="login" type="text" name="login" placeholder="Логин" required class="form-control"><br />

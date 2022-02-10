@@ -8,7 +8,10 @@ const User = model('User', new Schema({
 	patronymic: String,
 	login: String,
 	password: String,
-	role: String,
+	role: {
+		type: String,
+		enum: ['admin', 'user', 'client']
+	},
 	email: String,
 	supervisor: {
 		type: Boolean,
@@ -22,4 +25,4 @@ const User = model('User', new Schema({
 
 export default User
 
-db.user.insert({unique_id: 1, login: "admin", password: "password", role: "admin", supervisor: true})
+// db.user.insert({unique_id: 1, login: "admin", password: "password", role: "admin", supervisor: true})

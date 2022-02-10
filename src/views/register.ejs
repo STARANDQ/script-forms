@@ -26,7 +26,7 @@
 							document.getElementById("check").innerHTML =  response.error;
 							return
 						}
-						
+
 						if (response.success) {
 							$('#form1')[0].reset();
 							document.getElementById("aa").click();
@@ -56,6 +56,7 @@
 				<select class="form-control" name = "role" required>
 					<option value="user">Пользователь</option>
 					<option value="admin">Администратор</option>
+					<option value="client">Клиент</option>
 				</select><br/>
 				<div id = "add"></div>
         <input id="login" type="text" name="login" placeholder="Логин" required class="form-control"><br />
