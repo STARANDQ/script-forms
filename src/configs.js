@@ -1,5 +1,5 @@
 export default {
-  mongo: "web",
+  mongo: "local",
   port: 3030,
   "email": {
     "host": "smtp.ethereal.email",
