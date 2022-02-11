@@ -36,6 +36,7 @@ User.findOne()
         role: 'admin',
         supervisor: true
       })
+				.catch(e => console.error(e))
     }
   })
   .catch(e => console.error(e))
